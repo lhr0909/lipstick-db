@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+jina = "*"
+playwright = "*"
+docarray = {extras = ["annlite"], version = "*"}
+face-recognition = "*"
+opencv-contrib-python = "*"
+matplotlib = "*"
+mediapipe = "*"
+
+[dev-packages]
+autopep8 = "*"
+ipykernel = "*"
+ipython = "*"
+
+[requires]
+python_version = "3.8"
