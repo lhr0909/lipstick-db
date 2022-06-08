@@ -11,6 +11,7 @@ face-recognition = "*"
 opencv-contrib-python = "*"
 matplotlib = "*"
 mediapipe = "*"
+vika = "*"
 
 [dev-packages]
 autopep8 = "*"
