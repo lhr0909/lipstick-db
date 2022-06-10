@@ -41,9 +41,12 @@ FACE_MESH_CHIN = [
 ]
 
 class LipstickTrialImageIndexer(Executor):
-    @requests(on='/index')
+    @requests(on=['/index', '/lip_search', '/skin_search'])
     def index(self, docs: DocumentArray, **kwargs):
         for doc in docs:
+            if len(doc.chunks) > 0:
+                # skipping potentially processed documents
+                continue
             img_rgb = doc.tensor
             face_mesh = self._get_face_mesh(img_rgb)
             mask = self._get_skin_mask(img_rgb.shape, face_mesh)
@@ -157,7 +160,6 @@ class LipstickTrialImageIndexer(Executor):
 
     def _get_histogram_vector(self, hsv_colors, density=False, normalized=False):
         h_hist, h_hist_edges = np.histogram(hsv_colors[:,0], bins=18, range=(0, 179), density=density)
-        # h_hist, h_hist_edges = np.histogram(hsv_colors[:,0], bins=16, range=(0, 255), density=density)
         s_hist, h_hist_edges = np.histogram(hsv_colors[:,1], bins=16, range=(0, 255), density=density)
         v_hist, h_hist_edges = np.histogram(hsv_colors[:,2], bins=16, range=(0, 255), density=density)
         v = np.concatenate((h_hist, s_hist, v_hist), axis=None)

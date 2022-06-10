@@ -1,4 +1,0 @@
-jtype: LipstickTrialImageIndexer
-metas:
-  py_modules:
-    - executor.py

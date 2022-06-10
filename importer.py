@@ -4,15 +4,14 @@ from jina import Flow
 from jina.logging.profile import ProgressBar
 from docarray import Document
 
-from executor import LipstickTrialImageExecutor
+from indexer import LipstickTrialImageIndexer
 from model import Lipstick
 from storage import lipstick_db
 
 flow = Flow(
     port=8888,
 ).add(
-    uses=LipstickTrialImageExecutor,
-    name='lipstickTrialImageExecutor',
+    uses=LipstickTrialImageIndexer,
 )
 
 vika = Vika(os.environ.get('VIKA_API_KEY'))
