@@ -1,0 +1,7 @@
+.content-container {
+  min-height: 360px;
+}
+
+.content-container .ant-tabs-nav {
+  margin: 0;
+}
