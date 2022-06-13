@@ -1,7 +1,9 @@
 import React, { FC } from "react";
 import Link from "next/link";
 import { Layout, Menu } from "antd";
-import { HomeOutlined, SnippetsOutlined } from "@ant-design/icons";
+import Icon, { HomeOutlined, SnippetsOutlined } from "@ant-design/icons";
+
+import LipstickIcon from './LipstickIcon';
 
 const { Sider } = Layout;
 
@@ -32,6 +34,9 @@ export const SideNav: FC<SideNavProps> = ({
     <Menu theme="dark" mode="inline" defaultSelectedKeys={[selected]}>
       <Menu.Item key="/" icon={<HomeOutlined />}>
         <Link href="/">Home</Link>
+      </Menu.Item>
+      <Menu.Item key="/lipsticks" icon={<Icon component={LipstickIcon} />}>
+        <Link href="/lipsticks">Lipsticks</Link>
       </Menu.Item>
       <Menu.Item key="/playground" icon={<SnippetsOutlined />}>
         <Link href="/playground">Playground</Link>

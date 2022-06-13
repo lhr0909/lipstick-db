@@ -12,6 +12,9 @@ opencv-contrib-python = "*"
 matplotlib = "*"
 mediapipe = "*"
 vika = "*"
+fastapi = "*"
+uvicorn = "*"
+pydantic = "*"
 
 [dev-packages]
 autopep8 = "*"
