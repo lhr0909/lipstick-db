@@ -2,6 +2,7 @@ from jina import Executor, requests, Document, DocumentArray
 
 from storage import lipstick_db
 
+
 class LipstickTrialImageMatcher(Executor):
     @requests(on=['/lookup'])
     def lookup(self, docs: DocumentArray, **kwargs):

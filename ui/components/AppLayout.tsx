@@ -1,7 +1,7 @@
 import React, { FC, ReactNode } from "react";
 import { Layout } from "antd";
 import { useRouter } from "next/router";
-import createPersistedState from "use-persisted-state";
+import Link from "next/link";
 
 import { SideNav } from "./SideNav";
 
@@ -9,28 +9,20 @@ import styles from "styles/AppLayout.module.css";
 
 const { Content, Footer } = Layout;
 
-const useCollapsedState = createPersistedState("side-nav-collapsed");
-
 interface AppLayoutProps {
   children?: ReactNode;
 }
 
 export const AppLayout: FC<AppLayoutProps> = ({ children }: AppLayoutProps) => {
   const router = useRouter();
-  const [collapsed, setCollapsed] = useCollapsedState(false);
 
   return (
     <Layout
       className="min-h-screen"
-      style={{ marginLeft: collapsed ? "80px" : "200px" }}
     >
-      <SideNav
-        selected={router.pathname}
-        collapsed={collapsed as boolean}
-        setCollapsed={setCollapsed}
-      />
+      <SideNav selected={router.pathname} />
       <Layout className="bg-white">
-        <Content className="p-4 pb-20">
+        <Content className="p-4 pb-20 pt-20">
           <div
             className={`${styles["content-container"]} h-full w-full bg-white`}
           >
@@ -39,9 +31,12 @@ export const AppLayout: FC<AppLayoutProps> = ({ children }: AppLayoutProps) => {
         </Content>
         <Footer
           className="footer w-full h-20 flex text-center items-center justify-center fixed bottom-0"
-          style={{ paddingRight: collapsed ? "80px" : "200px" }}
         >
-          Made with &lt;3 by Simon Liang in 2022
+          {`Made with <3 by`}
+          &nbsp;
+          <Link href="https://divby0.io">Simon Liang</Link>
+          &nbsp;
+          {`in 2022`}
         </Footer>
       </Layout>
     </Layout>

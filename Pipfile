@@ -15,6 +15,7 @@ vika = "*"
 fastapi = "*"
 uvicorn = "*"
 pydantic = "*"
+boto3 = "*"
 
 [dev-packages]
 autopep8 = "*"

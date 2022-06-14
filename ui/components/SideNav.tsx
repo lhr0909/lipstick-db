@@ -1,46 +1,30 @@
 import React, { FC } from "react";
 import Link from "next/link";
 import { Layout, Menu } from "antd";
-import Icon, { HomeOutlined, SnippetsOutlined } from "@ant-design/icons";
+import Icon, { HomeOutlined, SearchOutlined } from "@ant-design/icons";
 
 import LipstickIcon from './LipstickIcon';
 
-const { Sider } = Layout;
+const { Header } = Layout;
 
 interface SideNavProps {
   selected: string;
-  collapsed: boolean;
-  setCollapsed: (bool: boolean) => void;
 }
 
 export const SideNav: FC<SideNavProps> = ({
   selected,
-  collapsed,
-  setCollapsed,
 }: SideNavProps) => (
-  <Sider
-    className="z-50"
-    collapsible
-    collapsed={collapsed}
-    onCollapse={() => setCollapsed(!collapsed)}
-    style={{
-      overflow: "auto",
-      height: "100vh",
-      position: "fixed",
-      left: 0,
-    }}
-  >
-    <div className="h-8 m-4 text-white">Lipstick DB</div>
-    <Menu theme="dark" mode="inline" defaultSelectedKeys={[selected]}>
+  <Header className="bg-white header w-full h-20 flex text-center items-center justify-center fixed top-0">
+    <Menu mode="horizontal" defaultSelectedKeys={[selected]}>
       <Menu.Item key="/" icon={<HomeOutlined />}>
-        <Link href="/">Home</Link>
+        <Link href="/">首页</Link>
       </Menu.Item>
       <Menu.Item key="/lipsticks" icon={<Icon component={LipstickIcon} />}>
-        <Link href="/lipsticks">Lipsticks</Link>
+        <Link href="/lipsticks">口红</Link>
       </Menu.Item>
-      <Menu.Item key="/playground" icon={<SnippetsOutlined />}>
-        <Link href="/playground">Playground</Link>
+      <Menu.Item key="/search" icon={<SearchOutlined />}>
+        <Link href="/search">搜索</Link>
       </Menu.Item>
     </Menu>
-  </Sider>
+  </Header>
 );

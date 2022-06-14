@@ -1,27 +1,29 @@
 import React from "react";
 import type { ReactElement } from "react";
+import { useRouter } from "next/router";
 import Head from "next/head";
 import Image from "next/image";
-import Link from "next/link";
-import { Typography, List, Descriptions, Tag, Space } from "antd";
+import { Typography, List, Descriptions, Tag, Card } from "antd";
 import useSWR from "swr";
 
 import { url, fetcher } from "utils/request";
 import { Lipstick, LIPSTICK_TAG_COLORS } from "utils/model";
 import { AppLayout } from "components/AppLayout";
+import { LipstickTrialImage } from "components/LipstickTrialImage";
 
 const { Title, Paragraph } = Typography;
 
-export default function LipsticksPage(props: { body: string }) {
-  const { data, error } = useSWR(url("/lipsticks"), fetcher);
+export default function LipstickPage(props: { body: string }) {
+  const router = useRouter();
+  const { id } = router.query;
+  const { data, error } = useSWR(() => !id ? null : url(`/lipsticks/${id}`), fetcher);
   return (
     <>
-      <Title level={2}>口红数据</Title>
-      <Paragraph>目前数据库中所有的口红。</Paragraph>
+      <Title level={2}>口红详细信息</Title>
       <List
         itemLayout="vertical"
         size="large"
-        dataSource={data}
+        dataSource={data ? [data] : []}
         renderItem={(item: Lipstick) => (
           <List.Item
             extra={
@@ -31,12 +33,6 @@ export default function LipsticksPage(props: { body: string }) {
                 height={300}
                 width={300}
               />
-            }
-            actions={[
-              <Space key="trials">
-                <Link href={`/lipsticks/${item.id}`}>查看试色图</Link>
-              </Space>
-            ]
             }
           >
             <Descriptions layout="vertical" title={`${item.brand} ${item.nickname}`}>
@@ -50,6 +46,23 @@ export default function LipsticksPage(props: { body: string }) {
                 ))}
               </Descriptions.Item>
             </Descriptions>
+            <Title level={5}>试色图</Title>
+            <List
+              grid={{
+                gutter: 16,
+                xs: 1,
+              }}
+              dataSource={item.trial_images}
+              renderItem={(trial: { uri: string; id: string }) => (
+                <List.Item>
+                  <LipstickTrialImage
+                    lipstickId={item.id}
+                    trialImageId={trial.id}
+                    trialImageUri={trial.uri}
+                  />
+                </List.Item>
+              )}
+            />
           </List.Item>
         )}
       />
@@ -57,11 +70,11 @@ export default function LipsticksPage(props: { body: string }) {
   );
 }
 
-LipsticksPage.getLayout = function getLayout(page: ReactElement) {
+LipstickPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <AppLayout>
       <Head>
-        <title>口红数据 - Lipstick DB</title>
+        <title>Lipstick Detail - Lipstick DB</title>
       </Head>
       {page}
     </AppLayout>

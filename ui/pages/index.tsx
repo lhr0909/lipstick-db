@@ -11,7 +11,7 @@ export default function IndexPage(props: { body: string }) {
   return (
     <>
       <Title level={2}>Lipstick DB</Title>
-      <Paragraph>找到最适合你的口红！</Paragraph>
+      <Paragraph>用AI找到最适合你的口红！</Paragraph>
     </>
   );
 }

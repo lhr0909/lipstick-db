@@ -5,6 +5,19 @@ export interface Lipstick {
   nickname: string;
   meta: { [key: string]: any };
   product_image: string;
+  trial_images: Array<{
+    id: string;
+    uri: string;
+  }>;
+}
+
+export interface LipstickTrialImageColors {
+  id: string;
+  parent_id: string;
+  modality: string;
+  tensor: number[][];
+  embedding: number[];
+  scores?: any;
 }
 
 export const LIPSTICK_TAG_COLORS: { [key: string]: string } = {

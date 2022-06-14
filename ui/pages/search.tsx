@@ -10,8 +10,8 @@ const { Title, Paragraph } = Typography;
 export default function PlaygroundPage(props: { body: string }) {
   return (
     <>
-      <Title level={2}>Playground</Title>
-      <Paragraph>Playground Page</Paragraph>
+      <Title level={2}>Search Lipstick with your Selfie!</Title>
+      <Paragraph>找到适合你的口红！</Paragraph>
     </>
   );
 }
@@ -20,7 +20,7 @@ PlaygroundPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <AppLayout>
       <Head>
-        <title>Playground - Lipstick DB</title>
+        <title>Search - Lipstick DB</title>
       </Head>
       {page}
     </AppLayout>

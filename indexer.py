@@ -40,6 +40,7 @@ FACE_MESH_CHIN = [
     (210, 202), (202, 43)
 ]
 
+
 class LipstickTrialImageIndexer(Executor):
     @requests(on=['/index', '/lip_search', '/skin_search'])
     def index(self, docs: DocumentArray, **kwargs):
@@ -97,7 +98,8 @@ class LipstickTrialImageIndexer(Executor):
                     image_shape[0]
                 )
                 chin_polygon.append(chin_point_px)
-            cv2.fillPoly(mask, pts=[np.array(chin_polygon, dtype=np.int32)], color=255)
+            cv2.fillPoly(
+                mask, pts=[np.array(chin_polygon, dtype=np.int32)], color=255)
             # fill left cheek
             left_cheek_polygon = []
             for left_cheek_point in FACE_MESH_LEFT_CHEEK:
@@ -108,7 +110,8 @@ class LipstickTrialImageIndexer(Executor):
                     image_shape[0]
                 )
                 left_cheek_polygon.append(left_cheek_point_px)
-            cv2.fillPoly(mask, pts=[np.array(left_cheek_polygon, dtype=np.int32)], color=255)
+            cv2.fillPoly(
+                mask, pts=[np.array(left_cheek_polygon, dtype=np.int32)], color=255)
             # fill right cheek
             right_cheek_polygon = []
             for right_cheek_point in FACE_MESH_RIGHT_CHEEK:
@@ -119,7 +122,8 @@ class LipstickTrialImageIndexer(Executor):
                     image_shape[0]
                 )
                 right_cheek_polygon.append(right_cheek_point_px)
-            cv2.fillPoly(mask, pts=[np.array(right_cheek_polygon, dtype=np.int32)], color=255)
+            cv2.fillPoly(
+                mask, pts=[np.array(right_cheek_polygon, dtype=np.int32)], color=255)
             # fill outer lip
             outer_lip_polygon = []
             for outer_lip_point in FACE_MESH_OUTER_LIP:
@@ -130,7 +134,8 @@ class LipstickTrialImageIndexer(Executor):
                     image_shape[0]
                 )
                 outer_lip_polygon.append(outer_lip_point_px)
-            cv2.fillPoly(mask, pts=[np.array(outer_lip_polygon, dtype=np.int32)], color=128)
+            cv2.fillPoly(
+                mask, pts=[np.array(outer_lip_polygon, dtype=np.int32)], color=128)
             # fill inner lip
             inner_lip_polygon = []
             for inner_lip_point in FACE_MESH_INNER_LIP:
@@ -141,27 +146,32 @@ class LipstickTrialImageIndexer(Executor):
                     image_shape[0]
                 )
                 inner_lip_polygon.append(inner_lip_point_px)
-            cv2.fillPoly(mask, pts=[np.array(inner_lip_polygon, dtype=np.int32)], color=0)
+            cv2.fillPoly(
+                mask, pts=[np.array(inner_lip_polygon, dtype=np.int32)], color=0)
         return mask
 
     def _get_colors_kmeans(self, values, K=20):
         Z = np.float32(values)
         # criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.0001)
         criteria = (cv2.TERM_CRITERIA_EPS, 100, 0.00001)
-        compactness, labels, centers = cv2.kmeans(Z, K, None, criteria, 50, cv2.KMEANS_PP_CENTERS)
+        compactness, labels, centers = cv2.kmeans(
+            Z, K, None, criteria, 50, cv2.KMEANS_PP_CENTERS)
         colors = centers
         return colors
 
     def _get_palette(self, colors, size=100, K=10):
         palette = np.zeros((size, K * size, 3), dtype=np.uint8)
         for i in range(colors.shape[0]):
-            palette[:, i * size : (i + 1) * size, :] = colors[i, :]
+            palette[:, i * size: (i + 1) * size, :] = colors[i, :]
         return palette
 
     def _get_histogram_vector(self, hsv_colors, density=False, normalized=False):
-        h_hist, h_hist_edges = np.histogram(hsv_colors[:,0], bins=18, range=(0, 179), density=density)
-        s_hist, h_hist_edges = np.histogram(hsv_colors[:,1], bins=16, range=(0, 255), density=density)
-        v_hist, h_hist_edges = np.histogram(hsv_colors[:,2], bins=16, range=(0, 255), density=density)
+        h_hist, h_hist_edges = np.histogram(
+            hsv_colors[:, 0], bins=18, range=(0, 179), density=density)
+        s_hist, h_hist_edges = np.histogram(
+            hsv_colors[:, 1], bins=16, range=(0, 255), density=density)
+        v_hist, h_hist_edges = np.histogram(
+            hsv_colors[:, 2], bins=16, range=(0, 255), density=density)
         v = np.concatenate((h_hist, s_hist, v_hist), axis=None)
         if normalized:
             return v / np.sqrt(np.sum(v ** 2))
