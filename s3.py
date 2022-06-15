@@ -1,6 +1,8 @@
 import os
 import boto3
 
+BUCKET_NAME = os.environ.get('S3_BUCKET_NAME', 'lipstick-db')
+
 s3_client = boto3.client(
   's3',
   endpoint_url=os.environ.get('S3_ENDPOINT_URL'),

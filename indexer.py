@@ -1,7 +1,11 @@
+import io
 import cv2
 import numpy as np
 import mediapipe as mp
 from jina import Executor, requests, Document, DocumentArray
+from docarray.document.mixins.image import _to_image_tensor
+
+from s3 import BUCKET_NAME, s3_client
 
 mp_face_mesh = mp.solutions.face_mesh
 mp_drawing = mp.solutions.drawing_utils
@@ -43,8 +47,17 @@ FACE_MESH_CHIN = [
 
 class LipstickTrialImageIndexer(Executor):
     @requests(on=['/index', '/lip_search', '/skin_search'])
-    def index(self, docs: DocumentArray, **kwargs):
+    def index(self, docs: DocumentArray, parameters, **kwargs):
         for doc in docs:
+            if parameters.get('s3', False) and doc.tensor is None:
+                print(f'downloading from s3://{BUCKET_NAME}/{doc.uri}')
+                # get the file from s3
+                s3_object = s3_client.get_object(Bucket=BUCKET_NAME, Key=doc.uri)
+                # get the file content
+                content = s3_object['Body'].read()
+                file_content = io.BytesIO(content)
+                # index the file
+                doc.tensor = _to_image_tensor(file_content)
             if len(doc.chunks) > 0:
                 # skipping potentially processed documents
                 continue

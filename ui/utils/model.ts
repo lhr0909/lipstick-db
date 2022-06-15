@@ -26,3 +26,9 @@ export const LIPSTICK_TAG_COLORS: { [key: string]: string } = {
   '哑光': 'blue',
   '亮面': 'green',
 };
+
+export interface S3UploadResponse {
+  url: string;
+  filename: string;
+  fields: { [key: string]: string };
+}

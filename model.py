@@ -53,6 +53,7 @@ class LipstickTrialImageColors(BaseModel):
 
 class UploadRequest(BaseModel):
     filename: str
+    fields: Optional[Dict[str, str]] = None
 
 class UploadLink(BaseModel):
     url: str

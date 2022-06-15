@@ -14,7 +14,7 @@ interface SideNavProps {
 export const SideNav: FC<SideNavProps> = ({
   selected,
 }: SideNavProps) => (
-  <Header className="bg-white header w-full h-20 flex text-center items-center justify-center fixed top-0">
+  <Header className="bg-white header w-full z-50 h-20 flex text-center items-center justify-center fixed top-0">
     <Menu mode="horizontal" defaultSelectedKeys={[selected]}>
       <Menu.Item key="/" icon={<HomeOutlined />}>
         <Link href="/">首页</Link>

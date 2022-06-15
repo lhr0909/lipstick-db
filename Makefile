@@ -10,7 +10,7 @@ importer:
 full-import: clean importer
 
 main-app:
-	pipenv run uvicorn main:app $(args)
+	JINA_MP_START_METHOD=forkserver pipenv run uvicorn main:app $(args)
 
 jina-app:
-	pipenv run python app.py
+	pipenv run jina flow --uses flow.yml

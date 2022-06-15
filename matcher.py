@@ -4,6 +4,10 @@ from storage import lipstick_db
 
 
 class LipstickTrialImageMatcher(Executor):
+    @requests(on='/all')
+    def get_all_lipsticks(self, **kwargs):
+        return lipstick_db
+
     @requests(on=['/lookup'])
     def lookup(self, docs: DocumentArray, **kwargs):
         da = DocumentArray()

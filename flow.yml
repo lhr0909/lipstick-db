@@ -1,0 +1,19 @@
+jtype: Flow
+with:
+  compression: Gzip
+  protocol: grpc
+  port: 8888
+  env:
+    JINA_LOG_LEVEL: debug
+executors:
+  - name: indexer
+    uses: LipstickTrialImageIndexer
+    py_modules:
+      - s3.py
+      - storage.py
+      - indexer.py
+  - name: matcher
+    uses: LipstickTrialImageMatcher
+    py_modules:
+      - storage.py
+      - matcher.py
