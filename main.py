@@ -1,4 +1,3 @@
-import io
 import os
 from typing import List
 from jina import Client as JinaClient

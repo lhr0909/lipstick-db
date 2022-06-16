@@ -5,12 +5,15 @@ clean:
 	rm -rf data
 
 importer:
-	JINA_MP_START_METHOD=forkserver pipenv run python importer.py
+	python importer.py
 
 full-import: clean importer
 
 main-app:
-	JINA_MP_START_METHOD=forkserver pipenv run uvicorn main:app $(args)
+	uvicorn main:app $(args)
 
 jina-app:
-	pipenv run jina flow --uses flow.yml
+	jina flow --uses flow.yml
+
+build-jina-docker:
+	docker build -f jina_app.Dockerfile -t lipstick-db-jina . --build-arg vika_api_key=$$VIKA_API_KEY

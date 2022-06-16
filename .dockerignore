@@ -1,0 +1,12 @@
+/crawler
+/misc
+/notebook
+/ui
+
+/data
+
+.env*
+*.ipynb
+*.jpg
+*.jpeg
+*.png
