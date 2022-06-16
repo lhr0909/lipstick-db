@@ -4,7 +4,7 @@ ARG vika_api_key
 
 WORKDIR /opt/server
 
-RUN pip install pipenv && apt-get update && apt-get install -y libgl1
+RUN pip install pipenv && apt-get update && apt-get install -y cmake libgl1
 
 COPY Pipfile Pipfile.lock Makefile /opt/server/
 
