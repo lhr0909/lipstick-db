@@ -46,14 +46,14 @@ def get_lipsticks(client: JinaClient = Depends(get_jina_client)) -> List[Lipstic
 
 @app.get("/lipsticks/{id}")
 def get_lipstick(id: str, client: JinaClient = Depends(get_jina_client)) -> LipstickModel:
-    db = client.post('/all')
+    db = client.post('/all', parameters={'slice': id})
     doc = lipstick_doc_to_model(db[id], include_trial_images=True)
     return doc
 
 
 @app.get("/lipsticks/{id}/trial_images/{trial_id}", response_model=List[LipstickTrialImageColors])
 def get_trial_image(id: str, trial_id: str, client: JinaClient = Depends(get_jina_client)) -> PydanticDocumentArray:
-    db = client.post('/all')
+    db = client.post('/all', parameters={'slice': id})
     trial_image: Document = db[id].chunks[-1].chunks[trial_id]
     skin_colors: Document = trial_image.chunks[1]
     skin_colors.tensor = convert_hsv_tensor_to_rgb(skin_colors.tensor)
@@ -80,15 +80,15 @@ def get_upload_file_url(filename: str, client = Depends(get_s3_client)) -> str:
 @app.get("/index/{filename}", response_model=List[LipstickTrialImageColors])
 def index_s3_file(
     filename: str,
-    s3 = Depends(get_s3_client),
     client: JinaClient = Depends(get_jina_client),
 ) -> str:
     document = Document(uri=filename)
     response: DocumentArray = client.post(
-        on='/index',
+        on='/s3_index',
         inputs=DocumentArray([document]),
-        parameters={'s3': True}
     )
+    response.summary()
+    response[0].summary()
     skin_colors: Document = response[0].chunks[1]
     skin_colors.tensor = convert_hsv_tensor_to_rgb(skin_colors.tensor)
     lip_colors: Document = response[0].chunks[2]

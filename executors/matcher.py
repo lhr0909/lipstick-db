@@ -5,7 +5,13 @@ from storage import lipstick_db
 
 class LipstickTrialImageMatcher(Executor):
     @requests(on='/all')
-    def get_all_lipsticks(self, **kwargs):
+    def get_all_lipsticks(self, parameters, **kwargs):
+        if parameters.get('slice'):
+            d = lipstick_db[parameters.get('slice')]
+            if isinstance(d, Document):
+                return DocumentArray([d])
+            else:
+                return d
         return lipstick_db
 
     @requests(on=['/lookup'])
