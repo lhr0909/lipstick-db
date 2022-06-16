@@ -6,14 +6,21 @@ with:
   env:
     JINA_LOG_LEVEL: debug
 executors:
-  - name: indexer
-    uses: LipstickTrialImageIndexer
+  - name: s3_downloader
+    uses: S3Downloader
     py_modules:
       - s3.py
-      - storage.py
-      - indexer.py
+      - executors/s3_downloader.py
+  - name: face_mesher
+    uses: FaceMesher
+    py_modules:
+      - executors/face_mesher.py
+  - name: lip_skin_color_embedder
+    uses: LipSkinColorEmbedder
+    py_modules:
+      - executors/lip_skin_color_embedder.py
   - name: matcher
     uses: LipstickTrialImageMatcher
     py_modules:
       - storage.py
-      - matcher.py
+      - executors/matcher.py

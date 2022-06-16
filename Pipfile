@@ -4,9 +4,9 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-jina = "*"
+jina = "==3.6.3"
 playwright = "*"
-docarray = {extras = ["annlite"], version = "*"}
+docarray = {extras = ["annlite"], version = "==0.13.22"}
 face-recognition = "*"
 opencv-contrib-python = "*"
 matplotlib = "*"
@@ -23,4 +23,4 @@ ipykernel = "*"
 ipython = "*"
 
 [requires]
-python_version = "3.8"
+python_version = "3.9"

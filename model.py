@@ -23,10 +23,12 @@ def trial_images_getter(doc: Document) -> List[Dict[str, str]]:
 @dataclass
 class Lipstick:
     brand: Text
+    series: Text
     color: Text
+    name: Text
     nickname: Text
     meta: JSON
-    product_image: Image
+    product_image: Text
     # nested document for embeddings of skin and lip colors from all the trials
     trial_images: TrialImages = field(
         setter=trial_images_setter, getter=trial_images_getter, default_factory=lambda: [])
@@ -35,7 +37,9 @@ class Lipstick:
 class LipstickModel(BaseModel):
     id: str
     brand: str
+    series: str
     color: str
+    name: str
     nickname: str
     meta: Dict[str, Any]
     product_image: str
@@ -65,7 +69,9 @@ def lipstick_doc_to_model(doc: Document, include_trial_images=False) -> Lipstick
     lipstick_model = LipstickModel(
         id=doc.id,
         brand=lipstick.brand,
+        series=lipstick.series,
         color=lipstick.color,
+        name=lipstick.name,
         nickname=lipstick.nickname,
         meta=lipstick.meta,
         product_image=lipstick.product_image,

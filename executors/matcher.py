@@ -12,7 +12,7 @@ class LipstickTrialImageMatcher(Executor):
     def lookup(self, docs: DocumentArray, **kwargs):
         da = DocumentArray()
         for doc in docs:
-            parent_doc: Document = lipstick_db['@c[5]c'][doc.parent_id]
+            parent_doc: Document = lipstick_db['@c[-1]c'][doc.parent_id]
             grandparent_doc: Document = lipstick_db['@c'][parent_doc.parent_id]
             great_grandparent_doc: Document = lipstick_db[grandparent_doc.parent_id]
             da.append(great_grandparent_doc)
@@ -20,7 +20,7 @@ class LipstickTrialImageMatcher(Executor):
 
     @requests(on='/lip_search')
     def lip_search(self, docs: DocumentArray, **kwargs):
-        lip_colors: DocumentArray = lipstick_db['@c[5]cc[2]']
+        lip_colors: DocumentArray = lipstick_db['@c[-1]cc[2]']
         lip_color_query: DocumentArray = docs['@c[2]']
         lip_color_query.match(
             lip_colors,
@@ -32,7 +32,7 @@ class LipstickTrialImageMatcher(Executor):
 
     @requests(on='/skin_search')
     def skin_search(self, docs: DocumentArray, **kwargs):
-        skin_colors: DocumentArray = lipstick_db['@c[5]cc[1]']
+        skin_colors: DocumentArray = lipstick_db['@c[-1]cc[1]']
         skin_color_query: DocumentArray = docs['@c[1]']
         skin_color_query.match(
             skin_colors,

@@ -1,11 +1,7 @@
-import io
 import cv2
 import numpy as np
 import mediapipe as mp
 from jina import Executor, requests, Document, DocumentArray
-from docarray.document.mixins.image import _to_image_tensor
-
-from s3 import BUCKET_NAME, s3_client
 
 mp_face_mesh = mp.solutions.face_mesh
 mp_drawing = mp.solutions.drawing_utils
@@ -45,47 +41,20 @@ FACE_MESH_CHIN = [
 ]
 
 
-class LipstickTrialImageIndexer(Executor):
-    @requests(on=['/index', '/lip_search', '/skin_search'])
-    def index(self, docs: DocumentArray, parameters, **kwargs):
+class FaceMesher(Executor):
+    @requests(on=['/s3_index', '/index', '/lip_search', '/skin_search'])
+    def face_mesh_mask(self, docs: DocumentArray, **kwargs):
         for doc in docs:
-            if parameters.get('s3', False) and doc.tensor is None:
-                print(f'downloading from s3://{BUCKET_NAME}/{doc.uri}')
-                # get the file from s3
-                s3_object = s3_client.get_object(Bucket=BUCKET_NAME, Key=doc.uri)
-                # get the file content
-                content = s3_object['Body'].read()
-                file_content = io.BytesIO(content)
-                # index the file
-                doc.tensor = _to_image_tensor(file_content)
-            if len(doc.chunks) > 0:
-                # skipping potentially processed documents
-                continue
+            if len(doc.chunks) >= 1:
+                raise RuntimeError('chunks indices are off, please check pipeline')
             img_rgb = doc.tensor
             face_mesh = self._get_face_mesh(img_rgb)
             mask = self._get_skin_mask(img_rgb.shape, face_mesh)
             mask_doc = Document(tensor=mask, modality='mask')
             doc.chunks.append(mask_doc)
-            img_hsv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV)
-            skin_colors = self._get_colors_kmeans(img_hsv[mask == 255])
-            skin_vector = self._get_histogram_vector(skin_colors)
-            skin_colors_doc = Document(
-                tensor=skin_colors,
-                embedding=skin_vector,
-                modality='skin_colors',
-            )
-            doc.chunks.append(skin_colors_doc)
-            lip_colors = self._get_colors_kmeans(img_hsv[mask == 128])
-            lip_vector = self._get_histogram_vector(lip_colors)
-            lip_colors_doc = Document(
-                tensor=lip_colors,
-                embedding=lip_vector,
-                modality='lip_colors',
-            )
-            doc.chunks.append(lip_colors_doc)
         return docs
 
-    def _get_face_mesh(self, img_rgb):
+    def _get_face_mesh(self, img_rgb: np.ndarray):
         # Run MediaPipe Face Mesh.
         with mp_face_mesh.FaceMesh(
                 static_image_mode=True,
@@ -162,31 +131,3 @@ class LipstickTrialImageIndexer(Executor):
             cv2.fillPoly(
                 mask, pts=[np.array(inner_lip_polygon, dtype=np.int32)], color=0)
         return mask
-
-    def _get_colors_kmeans(self, values, K=20):
-        Z = np.float32(values)
-        # criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.0001)
-        criteria = (cv2.TERM_CRITERIA_EPS, 100, 0.00001)
-        compactness, labels, centers = cv2.kmeans(
-            Z, K, None, criteria, 50, cv2.KMEANS_PP_CENTERS)
-        colors = centers
-        return colors
-
-    def _get_palette(self, colors, size=100, K=10):
-        palette = np.zeros((size, K * size, 3), dtype=np.uint8)
-        for i in range(colors.shape[0]):
-            palette[:, i * size: (i + 1) * size, :] = colors[i, :]
-        return palette
-
-    def _get_histogram_vector(self, hsv_colors, density=False, normalized=False):
-        h_hist, h_hist_edges = np.histogram(
-            hsv_colors[:, 0], bins=18, range=(0, 179), density=density)
-        s_hist, h_hist_edges = np.histogram(
-            hsv_colors[:, 1], bins=16, range=(0, 255), density=density)
-        v_hist, h_hist_edges = np.histogram(
-            hsv_colors[:, 2], bins=16, range=(0, 255), density=density)
-        v = np.concatenate((h_hist, s_hist, v_hist), axis=None)
-        if normalized:
-            return v / np.sqrt(np.sum(v ** 2))
-        else:
-            return v
