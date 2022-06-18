@@ -42,7 +42,7 @@ FACE_MESH_CHIN = [
 
 
 class FaceMesher(Executor):
-    @requests(on=['/s3_index', '/index', '/lip_search', '/skin_search'])
+    @requests(on=['/s3_index', '/index'])
     def face_mesh_mask(self, docs: DocumentArray, **kwargs):
         for doc in docs:
             if len(doc.chunks) >= 1:

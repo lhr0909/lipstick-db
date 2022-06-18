@@ -32,3 +32,13 @@ export interface S3UploadResponse {
   filename: string;
   fields: { [key: string]: string };
 }
+
+export interface SearchMatch {
+  lipstick_id: string;
+  trial_image_id: string;
+  score: number;
+}
+
+export interface SearchResult {
+  matches: SearchMatch[];
+}

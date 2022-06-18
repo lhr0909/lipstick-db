@@ -17,3 +17,6 @@ jina-app:
 
 build-jina-docker:
 	docker build -f jina_app.Dockerfile -t lipstick-db-jina . --build-arg vika_api_key=$$VIKA_API_KEY
+
+build-fastapi-docker:
+	docker build -f fastapi.Dockerfile -t lipstick-db-fastapi .

@@ -8,7 +8,7 @@ interface PaletteProps {
 export const Palette: FC<PaletteProps> = ({
   colors,
 }: PaletteProps) => {
-  return (
+  return !colors ? null : (
     <div className="w-full">
       {colors.map((color, idx) => (
         <span

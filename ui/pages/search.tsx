@@ -1,23 +1,116 @@
-import React from "react";
+import React, { useState } from "react";
 import type { ReactElement } from "react";
 import Head from "next/head";
-import { Typography, Row, Col } from "antd";
+import { Typography, Row, Col, Button, Switch, Space, List } from "antd";
+import type { UploadFile } from "antd/es/upload/interface";
 
+import { url, fetcher } from "utils/request";
+import { SearchMatch, SearchResult } from "utils/model";
 import { AppLayout } from "components/AppLayout";
 import { S3UploadControl } from "components/S3UploadControl";
+import { LipstickSearchResult } from "components/LipstickSearchResult";
+import { Palette } from 'components/Palette';
 
 const { Title, Paragraph } = Typography;
 
 export default function PlaygroundPage(props: { body: string }) {
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [isLipSearch, setLipSearch] = useState<boolean>(false);
+  const [searching, setSearching] = useState<boolean>(false);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+
+  async function triggerSearch(): Promise<void> {
+    setSearching(true);
+    const embeddings = await Promise.all(fileList.map(async (file) => {
+      const response = await fetcher(url(`/index/${file.uid}.${file.name.split(".").pop()}`));
+      file.response = response;
+      return response[isLipSearch ? 1 : 0].embedding;
+    }));
+    const results = await fetcher(url('/search'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        embeddings,
+        search_type: isLipSearch ? 'lip' : 'skin',
+      }),
+    });
+    setSearching(false);
+    setSearchResults(results);
+  }
+
   return (
     <>
       <Title level={2}>口红搜索</Title>
       <Paragraph>上传自拍，让AI给你找合适的口红！</Paragraph>
       <Row>
         <Col span={24}>
-          <S3UploadControl />
+          <S3UploadControl fileList={fileList} setFileList={setFileList} searching={searching} />
+          <Space>
+            <Switch
+              checkedChildren="唇色搜索"
+              unCheckedChildren="肤色搜索"
+              checked={isLipSearch}
+              onChange={setLipSearch}
+              loading={searching}
+            />
+            <Button
+              type="primary"
+              onClick={triggerSearch}
+              loading={searching}
+            >搜索</Button>
+          </Space>
         </Col>
       </Row>
+      {searchResults && searchResults.length > 0 && (
+        <Row className="mt-8">
+          <Col span={24}>
+            <Title level={3}>搜索结果</Title>
+            <List
+              itemLayout="vertical"
+              size="large"
+              dataSource={fileList.map((file: UploadFile, idx: number) => {
+                const result: SearchResult = searchResults[idx];
+                return [file, result] as [UploadFile, SearchResult];
+              })}
+              renderItem={([file, result]: [UploadFile, SearchResult]) => (
+                <List.Item
+                  key={file?.uid}
+                >
+                  {(!file || !result) ? null : (
+                    <List
+                      header={
+                        <Space>
+                          <img src={file.url || file.thumbUrl} alt={file.name} />
+                          {!file.response ? null : (
+                            <div style={{ width: 200 }}>
+                              <Typography.Paragraph>脸部颜色</Typography.Paragraph>
+                              <Palette colors={file.response[0].tensor}></Palette>
+                              <Typography.Paragraph>唇部颜色</Typography.Paragraph>
+                              <Palette colors={file.response[1].tensor}></Palette>
+                            </div>
+                          )}
+                        </Space>
+                      }
+                      grid={{ gutter: 16, column: 5 }}
+                      dataSource={result.matches}
+                      renderItem={(match: SearchMatch) => (
+                        <LipstickSearchResult
+                          key={`${match.lipstick_id}-${match.trial_image_id}`}
+                          lipstickId={match.lipstick_id}
+                          trialImageId={match.trial_image_id}
+                          score={match.score}
+                        />
+                      )}
+                    />
+                  )}
+                </List.Item>
+              )}
+            />
+          </Col>
+        </Row>
+      )}
     </>
   );
 }

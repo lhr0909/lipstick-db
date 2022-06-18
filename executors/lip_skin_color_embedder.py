@@ -3,7 +3,7 @@ import numpy as np
 from jina import Executor, requests, Document, DocumentArray
 
 class LipSkinColorEmbedder(Executor):
-    @requests(on=['/s3_index', '/index', '/lip_search', '/skin_search'])
+    @requests(on=['/s3_index', '/index'])
     def index(self, docs: DocumentArray, **kwargs):
         for doc in docs:
             if len(doc.chunks) > 1:
@@ -14,7 +14,7 @@ class LipSkinColorEmbedder(Executor):
             skin_colors = self._get_colors_kmeans(img_hsv[mask == 255])
             skin_vector = self._get_histogram_vector(skin_colors)
             skin_colors_doc = Document(
-                tensor=skin_colors,
+                tensor=self._convert_hsv_tensor_to_rgb(skin_colors),
                 embedding=skin_vector,
                 modality='skin_colors',
             )
@@ -22,7 +22,7 @@ class LipSkinColorEmbedder(Executor):
             lip_colors = self._get_colors_kmeans(img_hsv[mask == 128])
             lip_vector = self._get_histogram_vector(lip_colors)
             lip_colors_doc = Document(
-                tensor=lip_colors,
+                tensor=self._convert_hsv_tensor_to_rgb(lip_colors),
                 embedding=lip_vector,
                 modality='lip_colors',
             )
@@ -56,3 +56,10 @@ class LipSkinColorEmbedder(Executor):
             return v / np.sqrt(np.sum(v ** 2))
         else:
             return v
+
+    def _convert_hsv_tensor_to_rgb(self, hsv: np.ndarray) -> np.ndarray:
+        hsv_container = np.zeros((1, hsv.shape[0], hsv.shape[1]), dtype=np.uint8)
+        hsv_sorted = hsv[np.lexsort((hsv[:, 0], hsv[:, 1], hsv[:, 2]))]
+        hsv_container[0, :, :] = np.uint8(hsv_sorted)
+        rgb_container = cv2.cvtColor(hsv_container, cv2.COLOR_HSV2RGB)
+        return rgb_container[0, :, :]

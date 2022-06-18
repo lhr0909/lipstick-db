@@ -9,8 +9,13 @@ import { url, fetcher } from "utils/request";
 import { S3UploadResponse } from "utils/model";
 import { Palette } from './Palette';
 
-export const S3UploadControl: FC = () => {
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
+interface S3UploadControlProps {
+  fileList: UploadFile[];
+  setFileList: (fileList: UploadFile[]) => void;
+  searching: boolean;
+}
+
+export const S3UploadControl: FC<S3UploadControlProps> = ({ fileList, setFileList, searching }) => {
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewFile, setPreviewFile] = useState<UploadFile | null>(null);
   const { data } = useSWR(() =>
@@ -88,7 +93,7 @@ export const S3UploadControl: FC = () => {
         onChange={handleUploadChange}
         customRequest={uploadRequest}
       >
-        {fileList.length >= 5 ? null : (
+        {fileList.length >= 5 || searching ? null : (
           <div>
             <PlusOutlined />
             <div style={{ marginTop: 8 }}>上传</div>

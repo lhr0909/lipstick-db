@@ -5,9 +5,10 @@ from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from docarray import DocumentArray, Document
 from docarray.document.pydantic_model import PydanticDocumentArray
+import numpy as np
 
 
-from model import LipstickModel, UploadLink, UploadRequest, convert_hsv_tensor_to_rgb, lipstick_doc_to_model, LipstickTrialImageColors
+from model import LipstickModel, SearchMatch, SearchRequest, SearchResponse, UploadLink, UploadRequest, lipstick_doc_to_model, LipstickTrialImageColors
 from s3 import BUCKET_NAME, s3_client, s3_resource
 
 
@@ -53,12 +54,10 @@ def get_lipstick(id: str, client: JinaClient = Depends(get_jina_client)) -> Lips
 
 @app.get("/lipsticks/{id}/trial_images/{trial_id}", response_model=List[LipstickTrialImageColors])
 def get_trial_image(id: str, trial_id: str, client: JinaClient = Depends(get_jina_client)) -> PydanticDocumentArray:
-    db = client.post('/all', parameters={'slice': id})
+    db: DocumentArray = client.post('/all', parameters={'slice': id})
     trial_image: Document = db[id].chunks[-1].chunks[trial_id]
     skin_colors: Document = trial_image.chunks[1]
-    skin_colors.tensor = convert_hsv_tensor_to_rgb(skin_colors.tensor)
     lip_colors: Document = trial_image.chunks[2]
-    lip_colors.tensor = convert_hsv_tensor_to_rgb(lip_colors.tensor)
     return DocumentArray([skin_colors, lip_colors]).to_pydantic_model()
 
 
@@ -81,21 +80,43 @@ def get_upload_file_url(filename: str, client = Depends(get_s3_client)) -> str:
 def index_s3_file(
     filename: str,
     client: JinaClient = Depends(get_jina_client),
-) -> str:
+):
     document = Document(uri=filename)
     response: DocumentArray = client.post(
         on='/s3_index',
         inputs=DocumentArray([document]),
     )
-    response.summary()
-    response[0].summary()
     skin_colors: Document = response[0].chunks[1]
-    skin_colors.tensor = convert_hsv_tensor_to_rgb(skin_colors.tensor)
     lip_colors: Document = response[0].chunks[2]
-    lip_colors.tensor = convert_hsv_tensor_to_rgb(lip_colors.tensor)
     return DocumentArray([skin_colors, lip_colors]).to_pydantic_model()
 
 
 @app.post("/search")
-def search():
-    pass
+def search(req: SearchRequest, client: JinaClient = Depends(get_jina_client)):
+    docs = DocumentArray([Document(embedding=np.array(embedding, dtype=np.int32)) for embedding in req.embeddings])
+    search_response: DocumentArray = client.post(
+        on=f'/{req.search_type}_search',
+        inputs=docs,
+    )
+    responses = []
+    for doc in search_response:
+        trial_image_lookup: DocumentArray = client.post(
+            on='/lookup',
+            inputs = doc.matches,
+            parameters={'type': 'trial_image'},
+        )
+        lipstick_lookup: DocumentArray = client.post(
+            on='/lookup',
+            inputs = doc.matches,
+            parameters={'type': 'lipstick'},
+        )
+        response = SearchResponse(
+            matches=[SearchMatch(
+                lipstick_id=lipstick_lookup[idx].id,
+                trial_image_id=trial_image_lookup[idx].id,
+                score=match.scores['cosine'].value,
+            ) for idx, match in enumerate(doc.matches)],
+        )
+        responses.append(response)
+
+    return responses

@@ -1,7 +1,7 @@
 import os
 from vika import Vika
 from jina import Flow
-from docarray import Document
+from docarray import Document, DocumentArray
 from multiprocessing import freeze_support
 from jina.logging.profile import ProgressBar
 
@@ -52,7 +52,7 @@ if __name__ == '__main__':
                     trial_images=trial_images,
                 )
                 document = Document(lipstick)
-                da = flow.post(
+                da: DocumentArray = flow.post(
                     on='/index',
                     inputs=document.chunks[7].chunks,
                     parameters={},
