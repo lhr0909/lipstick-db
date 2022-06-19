@@ -85,10 +85,18 @@ export default function PlaygroundPage(props: { body: string }) {
                           <img src={file.url || file.thumbUrl} alt={file.name} />
                           {!file.response ? null : (
                             <div style={{ width: 200 }}>
-                              <Typography.Paragraph>脸部颜色</Typography.Paragraph>
-                              <Palette colors={file.response[0].tensor}></Palette>
-                              <Typography.Paragraph>唇部颜色</Typography.Paragraph>
-                              <Palette colors={file.response[1].tensor}></Palette>
+                              {isLipSearch ? null : (
+                                <>
+                                  <Typography.Paragraph>脸部颜色</Typography.Paragraph>
+                                  <Palette colors={file.response[0].tensor}></Palette>
+                                </>
+                              )}
+                              {!isLipSearch ? null : (
+                                <>
+                                  <Typography.Paragraph>唇部颜色</Typography.Paragraph>
+                                  <Palette colors={file.response[1].tensor}></Palette>
+                                </>
+                              )}
                             </div>
                           )}
                         </Space>
@@ -97,6 +105,7 @@ export default function PlaygroundPage(props: { body: string }) {
                       dataSource={result.matches}
                       renderItem={(match: SearchMatch) => (
                         <LipstickSearchResult
+                          isLipSearch={isLipSearch}
                           key={`${match.lipstick_id}-${match.trial_image_id}`}
                           lipstickId={match.lipstick_id}
                           trialImageId={match.trial_image_id}

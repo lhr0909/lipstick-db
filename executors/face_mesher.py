@@ -49,7 +49,7 @@ class FaceMesher(Executor):
                 raise RuntimeError('chunks indices are off, please check pipeline')
             img_rgb = doc.tensor
             face_mesh = self._get_face_mesh(img_rgb)
-            mask = self._get_skin_mask(img_rgb.shape, face_mesh)
+            mask = self._get_skin_mask(img_rgb, face_mesh)
             mask_doc = Document(tensor=mask, modality='mask')
             doc.chunks.append(mask_doc)
         return docs
@@ -64,7 +64,8 @@ class FaceMesher(Executor):
             results = face_mesh.process(img_rgb)
             return results.multi_face_landmarks
 
-    def _get_skin_mask(self, image_shape, landmark_list):
+    def _get_skin_mask(self, img_rgb: np.ndarray, landmark_list):
+        image_shape = img_rgb.shape
         if landmark_list is None:
             return None
         mask = np.zeros(image_shape[:2], dtype=np.uint8)
@@ -130,4 +131,10 @@ class FaceMesher(Executor):
                 inner_lip_polygon.append(inner_lip_point_px)
             cv2.fillPoly(
                 mask, pts=[np.array(inner_lip_polygon, dtype=np.int32)], color=0)
+
+        # filter out skin outliers
+        img_hsv = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2HSV)
+        for x, y in zip(*np.where(mask == 255)):
+            if (img_hsv[x, y, 0] > 25 or img_hsv[x, y, 0] < 6) or (img_hsv[x, y, 1] > 150 or img_hsv[x, y, 1] < 50):
+                mask[x, y] = 0
         return mask

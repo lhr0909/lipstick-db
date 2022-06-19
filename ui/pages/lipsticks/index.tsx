@@ -39,11 +39,16 @@ export default function LipsticksPage(props: { body: string }) {
             ]
             }
           >
-            <Descriptions layout="vertical" title={`${item.brand} ${item.nickname}`}>
-              <Descriptions.Item label="品牌">{item.brand}</Descriptions.Item>
-              <Descriptions.Item label="色号">{item.color}</Descriptions.Item>
-              <Descriptions.Item label="关键字">
+            <Descriptions layout="vertical" title={`${item.brand} ${item.series} ${item.name || item.nickname} (${item.color})`}>
+              <Descriptions.Item label="类型">
                 {(item.meta.type || []).map((keyword: string) => (
+                  <Tag key={keyword} color={LIPSTICK_TAG_COLORS[keyword]}>
+                    {keyword}
+                  </Tag>
+                ))}
+              </Descriptions.Item>
+              <Descriptions.Item label="质地">
+                {(item.meta.texture || []).map((keyword: string) => (
                   <Tag key={keyword} color={LIPSTICK_TAG_COLORS[keyword]}>
                     {keyword}
                   </Tag>

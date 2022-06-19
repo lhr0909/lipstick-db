@@ -46,7 +46,7 @@ if __name__ == '__main__':
                     nickname=fields.get('昵称/中文名称', fields.get('官方名称')),
                     meta={
                         'type': fields.get('类型'),
-                        'texture': fields.get('质感'),
+                        'texture': fields.get('质地'),
                     },
                     product_image=product_image,
                     trial_images=trial_images,

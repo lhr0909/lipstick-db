@@ -1,23 +1,34 @@
 import React, { FC } from 'react';
 import useSWR from 'swr';
-import { Card } from 'antd';
+import Link from 'next/link';
+import { Card, Space } from 'antd';
+import Icon from '@ant-design/icons';
 
-import { Lipstick } from 'utils/model';
+import { Lipstick, LipstickTrialImageColors } from 'utils/model';
 import { fetcher, url } from 'utils/request';
+import LipstickIcon from './LipstickIcon';
+import { Palette } from './Palette';
 
 interface LipstickSearchResultProps {
+  isLipSearch: boolean;
   lipstickId: string;
   trialImageId: string;
-  score: number
+  score: number;
 }
 
 export const LipstickSearchResult: FC<LipstickSearchResultProps> = ({
+  isLipSearch,
   lipstickId,
   trialImageId,
   score,
 }) => {
-  const { data: lipstick, error } = useSWR<Lipstick>(
+  const { data: lipstick } = useSWR<Lipstick>(
     url('/lipsticks/' + lipstickId),
+    fetcher,
+  );
+
+  const { data: trialImageColors } = useSWR<LipstickTrialImageColors[]>(
+    url('/lipsticks/' + lipstickId + '/trial_images/' + trialImageId),
     fetcher,
   );
 
@@ -27,14 +38,25 @@ export const LipstickSearchResult: FC<LipstickSearchResultProps> = ({
       style={{ width: 200 }}
       cover={
 lipstick.trial_images.find(trialImage => trialImage.id === trialImageId) && (
-          <img src={(lipstick.trial_images.find(trialImage => trialImage.id === trialImageId) as any).uri} />
+          <img src={lipstick.product_image} />
+          // <img src={(lipstick.trial_images.find(trialImage => trialImage.id === trialImageId) as any).uri} />
         )
       }
+      actions={[
+        <Link key="view-lipstick" href={`/lipsticks/${lipstickId}`}>
+          <Space>
+            <Icon style={{ width: 14 }} component={LipstickIcon} />
+            查看
+          </Space>
+        </Link>
+      ]}
     >
-      {/* <img src={lipstick.product_image} /> */}
+      {/* {trialImageColors && (
+        <Palette colors={trialImageColors[isLipSearch ? 1 : 0].tensor}></Palette>
+      )} */}
       <Card.Meta
         title={lipstick.brand + ' ' + lipstick.nickname}
-        description={`相似度：${Math.floor((1 - score) * 10000) / 100}%`}
+        description={`匹配度：${Math.floor((1 - score) * 10000) / 100}%`}
       />
     </Card>
   );
