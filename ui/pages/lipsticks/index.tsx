@@ -40,6 +40,12 @@ export default function LipsticksPage(props: { body: string }) {
             }
           >
             <Descriptions layout="vertical" title={`${item.brand} ${item.series} ${item.name || item.nickname} (${item.color})`}>
+              <Descriptions.Item label="昵称">
+                {item.nickname}
+              </Descriptions.Item>
+              <Descriptions.Item label="价格">
+                ¥{item.meta.price}
+              </Descriptions.Item>
               <Descriptions.Item label="类型">
                 {(item.meta.type || []).map((keyword: string) => (
                   <Tag key={keyword} color={LIPSTICK_TAG_COLORS[keyword]}>

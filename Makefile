@@ -20,3 +20,6 @@ build-jina-docker:
 
 build-fastapi-docker:
 	docker build -f fastapi.Dockerfile -t lipstick-db-fastapi .
+
+wife-mode-test:
+	python -m executors.matcher

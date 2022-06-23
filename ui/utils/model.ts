@@ -25,7 +25,7 @@ export interface LipstickTrialImageColors {
 export const LIPSTICK_TAG_COLORS: { [key: string]: string } = {
   '唇膏': 'red',
   '唇釉': 'orange',
-  '蠢泥': 'yellow',
+  '唇泥': 'yellow',
   '哑光': 'purple',
   '亮面': 'blue',
 };

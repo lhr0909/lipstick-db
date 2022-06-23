@@ -34,11 +34,12 @@ export const LipstickSearchResult: FC<LipstickSearchResultProps> = ({
 
   return !lipstick ? null : (
     <Card
+      className="my-2 mx-auto"
       hoverable
       style={{ width: 200 }}
       cover={
 lipstick.trial_images.find(trialImage => trialImage.id === trialImageId) && (
-          <img src={lipstick.product_image} />
+          <img style={{width: '99%', marginTop: '1px', marginLeft: '1px'}} src={lipstick.product_image} />
           // <img src={(lipstick.trial_images.find(trialImage => trialImage.id === trialImageId) as any).uri} />
         )
       }

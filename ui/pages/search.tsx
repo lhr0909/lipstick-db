@@ -10,6 +10,7 @@ import { AppLayout } from "components/AppLayout";
 import { S3UploadControl } from "components/S3UploadControl";
 import { LipstickSearchResult } from "components/LipstickSearchResult";
 import { Palette } from 'components/Palette';
+import { SearchOutlined } from "@ant-design/icons";
 
 const { Title, Paragraph } = Typography;
 
@@ -44,10 +45,14 @@ export default function PlaygroundPage(props: { body: string }) {
     <>
       <Title level={2}>口红搜索</Title>
       <Paragraph>上传自拍，让AI给你找合适的口红！</Paragraph>
-      <Row>
+      <Row justify="center">
         <Col span={24}>
           <S3UploadControl fileList={fileList} setFileList={setFileList} searching={searching} />
-          <Space>
+        </Col>
+      </Row>
+      <Row>
+        <Col span={24}>
+          <Space className="my-2">
             <Switch
               checkedChildren="唇色搜索"
               unCheckedChildren="肤色搜索"
@@ -57,6 +62,7 @@ export default function PlaygroundPage(props: { body: string }) {
             />
             <Button
               type="primary"
+              icon={<SearchOutlined />}
               onClick={triggerSearch}
               loading={searching}
             >搜索</Button>
@@ -81,27 +87,31 @@ export default function PlaygroundPage(props: { body: string }) {
                   {(!file || !result) ? null : (
                     <List
                       header={
-                        <Space>
-                          <img src={file.url || file.thumbUrl} alt={file.name} />
-                          {!file.response ? null : (
-                            <div style={{ width: 200 }}>
-                              {isLipSearch ? null : (
-                                <>
-                                  <Typography.Paragraph>脸部颜色</Typography.Paragraph>
-                                  <Palette colors={file.response[0].tensor}></Palette>
-                                </>
-                              )}
-                              {!isLipSearch ? null : (
-                                <>
-                                  <Typography.Paragraph>唇部颜色</Typography.Paragraph>
-                                  <Palette colors={file.response[1].tensor}></Palette>
-                                </>
-                              )}
-                            </div>
-                          )}
-                        </Space>
+                        <Row>
+                          <Col xs={24} md={12}>
+                            <img className="block mx-auto" style={{ maxWidth: 200 }} src={file.url || file.thumbUrl} alt={file.name} />
+                          </Col>
+                          <Col xs={24} md={12}>
+                            {!file.response ? null : (
+                              <div className="my-4" style={{ minWidth: 200 }}>
+                                {isLipSearch ? null : (
+                                  <>
+                                    <Typography.Paragraph>脸部颜色</Typography.Paragraph>
+                                    <Palette colors={file.response[0].tensor}></Palette>
+                                  </>
+                                )}
+                                {!isLipSearch ? null : (
+                                  <>
+                                    <Typography.Paragraph>唇部颜色</Typography.Paragraph>
+                                    <Palette colors={file.response[1].tensor}></Palette>
+                                  </>
+                                )}
+                              </div>
+                            )}
+                          </Col>
+                        </Row>
                       }
-                      grid={{ gutter: 16, column: 5 }}
+                      grid={{ gutter: 8, xs: 1, sm: 2, md: 3, lg: 4, column: 5 }}
                       dataSource={result.matches}
                       renderItem={(match: SearchMatch) => (
                         <LipstickSearchResult
@@ -128,7 +138,7 @@ PlaygroundPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <AppLayout>
       <Head>
-        <title>Search - Lipstick DB</title>
+        <title>口红搜索 - Lipstick DB</title>
       </Head>
       {page}
     </AppLayout>

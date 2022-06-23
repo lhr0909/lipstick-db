@@ -23,6 +23,7 @@ export const LipstickTrialImage: FC<LipstickTrialImageProps> = ({
 
   return (
     <Card
+      className="my-2 mx-auto"
       style={{
         width: 200,
       }}

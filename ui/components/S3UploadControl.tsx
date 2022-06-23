@@ -86,6 +86,7 @@ export const S3UploadControl: FC<S3UploadControlProps> = ({ fileList, setFileLis
   return (
     <>
       <Upload
+        className="my-2"
         listType="picture-card"
         fileList={fileList}
         action={getUploadLink}

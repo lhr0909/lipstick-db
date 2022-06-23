@@ -47,6 +47,7 @@ if __name__ == '__main__':
                     meta={
                         'type': fields.get('类型'),
                         'texture': fields.get('质地'),
+                        'price': fields.get('官方参考价格'),
                     },
                     product_image=product_image,
                     trial_images=trial_images,
