@@ -56,7 +56,7 @@ lipstick.trial_images.find(trialImage => trialImage.id === trialImageId) && (
         <Palette colors={trialImageColors[isLipSearch ? 1 : 0].tensor}></Palette>
       )} */}
       <Card.Meta
-        title={lipstick.brand + ' ' + lipstick.nickname}
+        title={lipstick.brand + ' ' + lipstick.color}
         description={`匹配度：${Math.floor((1 - score) * 10000) / 100}%`}
       />
     </Card>

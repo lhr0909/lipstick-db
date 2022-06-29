@@ -3,7 +3,7 @@ from jina import Executor, requests, Document, DocumentArray
 
 from storage import lipstick_db
 
-if os.environ.get('WIFE_MODE') is None:
+if os.environ.get('WIFE_MODE') != 'true':
     db = lipstick_db
 else:
     print('\n\n===================')

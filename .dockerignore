@@ -3,8 +3,6 @@
 /notebook
 /ui
 
-/data
-
 .env*
 *.ipynb
 *.jpg

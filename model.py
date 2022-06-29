@@ -20,13 +20,21 @@ def trial_images_getter(doc: Document) -> List[Dict[str, str]]:
 
 @dataclass
 class Lipstick:
+    # 口红的品牌
     brand: Text
+    # 口红的系列
     series: Text
+    # 口红的色号
     color: Text
+    # 口红的色号名
     name: Text
+    # 口红的昵称
     nickname: Text
+    # 口红的类型、质地、价格等信息
     meta: JSON
+    # 口红图
     product_image: Text
+    # 试色图
     # nested document for embeddings of skin and lip colors from all the trials
     trial_images: TrialImages = field(
         setter=trial_images_setter, getter=trial_images_getter, default_factory=lambda: [])
