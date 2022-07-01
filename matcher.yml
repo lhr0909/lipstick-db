@@ -1,0 +1,7 @@
+jtype: LipstickTrialImageMatcher
+py_modules:
+  - storage.py
+  - executors/matcher.py
+metas:
+  name: LipstickTrialImageMatcher
+  description: Matches images with their corresponding lipstick color

@@ -1,0 +1,6 @@
+jtype: LipSkinColorEmbedder
+py_modules:
+  - executors/lip_skin_color_embedder.py
+metas:
+  name: LipSkinColorEmbedder
+  description: embeds lip and skin colors into documents

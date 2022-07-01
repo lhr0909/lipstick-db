@@ -1,0 +1,7 @@
+jtype: S3Downloader
+py_modules:
+  - s3.py
+  - executors/s3_downloader.py
+metas:
+  name: S3Downloader
+  description: Downloads images from S3 bucket

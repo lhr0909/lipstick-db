@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+  flow-service:
+    image: ccr.ccs.tencentyun.com/others/lipstick-db-jina:latest
+    restart: always
+    ports:
+      - 8888:8888
+    command: make jina-app
+  face-mesher:
+    image: ccr.ccs.tencentyun.com/others/lipstick-db-jina:latest
+    restart: always
+    ports:
+      - 8887:8887
+    command: jina executor --uses face_mesher.yml --port 8887
+  s3-downloader:
+    image: ccr.ccs.tencentyun.com/others/lipstick-db-jina:latest
+    restart: always
+    ports:
+      - 8886:8886
+    command: jina executor --uses s3_downloader.yml --port 8886
+    env_file:
+      - .env
+  lip-skin-color-embedder:
+    image: ccr.ccs.tencentyun.com/others/lipstick-db-jina:latest
+    restart: always
+    ports:
+      - 8885:8885
+    command: jina executor --uses lip_skin_color_embedder.yml --port 8885
+  matcher:
+    image: ccr.ccs.tencentyun.com/others/lipstick-db-jina:latest
+    restart: always
+    ports:
+      - 8884:8884
+    command: jina executor --uses matcher.yml --port 8884

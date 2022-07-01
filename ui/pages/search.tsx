@@ -45,6 +45,7 @@ export default function PlaygroundPage(props: { body: string }) {
     <>
       <Title level={2}>口红搜索</Title>
       <Paragraph>上传自拍，让AI给你找合适的口红！</Paragraph>
+      <Paragraph>请确保上传的照片有全脸，否则上传会出错，需要刷新页面重新上传。</Paragraph>
       <Row justify="center">
         <Col span={24}>
           <S3UploadControl fileList={fileList} setFileList={setFileList} searching={searching} />

@@ -2,25 +2,24 @@ jtype: Flow
 with:
   compression: Gzip
   protocol: grpc
+  prefetch: 2
   port: 8888
   env:
     JINA_LOG_LEVEL: debug
 executors:
   - name: s3_downloader
-    uses: S3Downloader
-    py_modules:
-      - s3.py
-      - executors/s3_downloader.py
+    host: s3-downloader
+    port: 8887
+    external: true
   - name: face_mesher
-    uses: FaceMesher
-    py_modules:
-      - executors/face_mesher.py
+    host: face-mesher
+    port: 8886
+    external: true
   - name: lip_skin_color_embedder
-    uses: LipSkinColorEmbedder
-    py_modules:
-      - executors/lip_skin_color_embedder.py
+    host: lip-skin-color-embedder
+    port: 8885
+    external: true
   - name: matcher
-    uses: LipstickTrialImageMatcher
-    py_modules:
-      - storage.py
-      - executors/matcher.py
+    host: matcher
+    port: 8884
+    external: true

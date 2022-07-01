@@ -1,0 +1,6 @@
+jtype: FaceMesher
+py_modules:
+  - executors/face_mesher.py
+metas:
+  name: FaceMesher
+  description: Generates Face Mesh and Masks Images using MediaPipe
