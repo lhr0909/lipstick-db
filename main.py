@@ -36,6 +36,9 @@ def get_s3_resource():
 def get_jina_client():
     yield jina_client
 
+@app.get('/')
+def root():
+    return 'OK'
 
 @app.get("/lipsticks")
 async def get_lipsticks(client: JinaClient = Depends(get_jina_client)) -> List[LipstickModel]:
