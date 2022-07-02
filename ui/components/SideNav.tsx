@@ -19,9 +19,9 @@ export const SideNav: FC<SideNavProps> = ({
       <Menu.Item key="/" icon={<HomeOutlined />}>
         <Link href="/">首页</Link>
       </Menu.Item>
-      <Menu.Item key="/lipsticks" icon={<Icon component={LipstickIcon} />}>
+      {/* <Menu.Item key="/lipsticks" icon={<Icon component={LipstickIcon} />}>
         <Link href="/lipsticks">口红</Link>
-      </Menu.Item>
+      </Menu.Item> */}
       <Menu.Item key="/search" icon={<SearchOutlined />}>
         <Link href="/search">搜索</Link>
       </Menu.Item>

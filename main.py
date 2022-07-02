@@ -14,6 +14,7 @@ from s3 import BUCKET_NAME, s3_client, s3_resource
 
 jina_client = JinaClient(
     host=os.environ.get('JINA_HOST', 'grpc://0.0.0.0:8888'),
+    asyncio=True,
 )
 
 app = FastAPI()
@@ -37,27 +38,27 @@ def get_jina_client():
 
 
 @app.get("/lipsticks")
-def get_lipsticks(client: JinaClient = Depends(get_jina_client)) -> List[LipstickModel]:
-    db = client.post('/all')
+async def get_lipsticks(client: JinaClient = Depends(get_jina_client)) -> List[LipstickModel]:
     lipsticks = []
-    for doc in db:
-        lipsticks.append(lipstick_doc_to_model(doc))
+    async for docs in client.post('/all'):
+        for doc in docs:
+            lipsticks.append(lipstick_doc_to_model(doc))
     return lipsticks
 
 
 @app.get("/lipsticks/{id}")
-def get_lipstick(id: str, client: JinaClient = Depends(get_jina_client)) -> LipstickModel:
-    db = client.post('/all', parameters={'slice': id})
-    doc = lipstick_doc_to_model(db[id], include_trial_images=True)
+async def get_lipstick(id: str, client: JinaClient = Depends(get_jina_client)) -> LipstickModel:
+    async for db in client.post('/all', parameters={'slice': id}):
+        doc = lipstick_doc_to_model(db[id], include_trial_images=True)
     return doc
 
 
 @app.get("/lipsticks/{id}/trial_images/{trial_id}", response_model=List[LipstickTrialImageColors])
-def get_trial_image(id: str, trial_id: str, client: JinaClient = Depends(get_jina_client)) -> PydanticDocumentArray:
-    db: DocumentArray = client.post('/all', parameters={'slice': id})
-    trial_image: Document = db[id].chunks[-1].chunks[trial_id]
-    skin_colors: Document = trial_image.chunks[1]
-    lip_colors: Document = trial_image.chunks[2]
+async def get_trial_image(id: str, trial_id: str, client: JinaClient = Depends(get_jina_client)) -> PydanticDocumentArray:
+    async for db in client.post('/all', parameters={'slice': id}):
+        trial_image: Document = db[id].chunks[-1].chunks[trial_id]
+        skin_colors: Document = trial_image.chunks[1]
+        lip_colors: Document = trial_image.chunks[2]
     return DocumentArray([skin_colors, lip_colors]).to_pydantic_model()
 
 
@@ -77,46 +78,45 @@ def get_upload_file_url(filename: str, client = Depends(get_s3_client)) -> str:
     return url
 
 @app.get("/index/{filename}", response_model=List[LipstickTrialImageColors])
-def index_s3_file(
+async def index_s3_file(
     filename: str,
     client: JinaClient = Depends(get_jina_client),
 ):
     document = Document(uri=filename)
-    response: DocumentArray = client.post(
+    async for response in client.post(
         on='/s3_index',
         inputs=DocumentArray([document]),
-    )
-    skin_colors: Document = response[0].chunks[1]
-    lip_colors: Document = response[0].chunks[2]
+    ):
+        skin_colors: Document = response[0].chunks[1]
+        lip_colors: Document = response[0].chunks[2]
     return DocumentArray([skin_colors, lip_colors]).to_pydantic_model()
 
 
 @app.post("/search")
-def search(req: SearchRequest, client: JinaClient = Depends(get_jina_client)):
+async def search(req: SearchRequest, client: JinaClient = Depends(get_jina_client)):
     docs = DocumentArray([Document(embedding=np.array(embedding, dtype=np.int32)) for embedding in req.embeddings])
-    search_response: DocumentArray = client.post(
+    responses = []
+    async for search_response in client.post(
         on=f'/{req.search_type}_search',
         inputs=docs,
-    )
-    responses = []
-    for doc in search_response:
-        trial_image_lookup: DocumentArray = client.post(
-            on='/lookup',
-            inputs = doc.matches,
-            parameters={'type': 'trial_image'},
-        )
-        lipstick_lookup: DocumentArray = client.post(
-            on='/lookup',
-            inputs = doc.matches,
-            parameters={'type': 'lipstick'},
-        )
-        response = SearchResponse(
-            matches=[SearchMatch(
-                lipstick_id=lipstick_lookup[idx].id,
-                trial_image_id=trial_image_lookup[idx].id,
-                score=match.scores['cosine'].value,
-            ) for idx, match in enumerate(doc.matches)],
-        )
-        responses.append(response)
-
+    ):
+        for doc in search_response:
+            async for trial_image_lookup in client.post(
+                on='/lookup',
+                inputs = doc.matches,
+                parameters={'type': 'trial_image'},
+            ):
+                async for lipstick_lookup in client.post(
+                    on='/lookup',
+                    inputs = doc.matches,
+                    parameters={'type': 'lipstick'},
+                ):
+                    response = SearchResponse(
+                        matches=[SearchMatch(
+                            lipstick_id=lipstick_lookup[idx].id,
+                            trial_image_id=trial_image_lookup[idx].id,
+                            score=match.scores['cosine'].value,
+                        ) for idx, match in enumerate(doc.matches)],
+                    )
+                    responses.append(response)
     return responses
