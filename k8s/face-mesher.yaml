@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: face-mesher
+  name: face-mesher
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: face-mesher
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: face-mesher
+    spec:
+      containers:
+      - image:  ccr.ccs.tencentyun.com/others/lipstick-db-jina:latest
+        name:  face-mesher
+        command:  ["jina", "executor"] 
+        args: ["--uses", "face_mesher.yml" ,"--port", "8886"]
+        env:
+          - name: JINA_LOG_LEVEL
+            value: DEBUG
+        ports:
+        - containerPort: 8886
+        resources: {}
+      imagePullSecrets:
+      - name: regcred
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: face-mesher
+spec:
+  selector:
+    app: face-mesher
+  ports:
+  - protocol: TCP
+    port: 8886
+    targetPort: 8886

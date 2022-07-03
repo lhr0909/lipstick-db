@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: flow-service
+  name: flow-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flow-service
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: flow-service
+    spec:
+      containers:
+      - image: ccr.ccs.tencentyun.com/others/lipstick-db-jina:latest 
+        name: flow-service
+        command: ["make"] 
+        args: ["jina-app"]
+        env:
+          - name: JINA_LOG_LEVEL
+            value: DEBUG
+        ports:
+        - containerPort: 8888
+        resources: {}
+      imagePullSecrets:
+      - name: regcred
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flow-service
+spec:
+  selector:
+    app: flow-service
+  ports:
+  - protocol: TCP
+    port: 8888
+    targetPort: 8888

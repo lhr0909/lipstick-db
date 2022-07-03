@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: s3-downloader
+  name: s3-downloader
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: s3-downloader
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: s3-downloader
+    spec:
+      containers:
+      - image:  ccr.ccs.tencentyun.com/others/lipstick-db-jina:latest
+        name:  s3-downloader
+        command:  ["jina", "executor"]
+        args: ["--uses", "s3_downloader.yml", "--port", "8887"]
+        env:
+          - name: JINA_LOG_LEVEL
+            value: DEBUG
+          - name: S3_ENDPOINT_URL
+            value: https://cos.ap-guangzhou.myqcloud.com
+          - name: S3_ACCESS_KEY_ID
+            value: 
+          - name: S3_SECRET_ACCESS_KEY
+            value: 
+          - name: S3_REGION
+            value: ap-guangzhou
+          - name: S3_BUCKET_NAME
+            value: lipstick-db-1301213709
+        ports:
+        - containerPort: 8887
+        resources: {}
+      imagePullSecrets:
+      - name: regcred
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: s3-downloader
+spec:
+  selector:
+    app: s3-downloader
+  ports:
+  - protocol: TCP
+    port: 8887
+    targetPort: 8887
