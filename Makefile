@@ -15,6 +15,9 @@ main-app:
 jina-app:
 	jina flow --uses flow.yml
 
+jina-local:
+	python flow.py
+
 build-jina-docker:
 	docker build -f jina_app.Dockerfile -t lipstick-db-jina . --build-arg vika_api_key=$$VIKA_API_KEY
 

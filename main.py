@@ -38,7 +38,7 @@ def get_jina_client():
 
 @app.get('/')
 def root():
-    return 'OK'
+    return { 'status': 'OK' }
 
 @app.get("/lipsticks")
 async def get_lipsticks(client: JinaClient = Depends(get_jina_client)) -> List[LipstickModel]:

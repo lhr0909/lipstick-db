@@ -8,4 +8,4 @@ RUN pip install jina==3.6.3 docarray==0.13.22 fastapi uvicorn pydantic boto3
 
 COPY main.py model.py s3.py /opt/server/
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "9000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "9000", "--loop", "asyncio"]

@@ -14,14 +14,14 @@ from executors.s3_downloader import S3Downloader
 flow = Flow().add(uses=S3Downloader).add(uses=FaceMesher).add(uses=LipSkinColorEmbedder)
 
 vika = Vika(os.environ.get('VIKA_API_KEY'))
-lipstick_datasheet = vika.datasheet("dstHNrtRuqeMGdpqji", field_key="name")
+lipstick_datasheet = vika.datasheet(os.environ.get('VIKA_DATASHEET_ID'), field_key="name")
 lipstick_trials_datasheet = vika.datasheet(
-    "dst6uTXHrt2SXHTaix", field_key="name")
+    os.environ.get('VIKA_TRIAL_DATASHEET_ID'), field_key="name")
 
 if __name__ == '__main__':
     freeze_support()
     with flow, lipstick_db:
-        records = lipstick_datasheet.records.all(viewId="viwJNgRCT005k")
+        records = lipstick_datasheet.records.all(viewId=os.environ.get('VIKA_VIEW_ID'))
         with ProgressBar(
             description='Importing Lipsticks Data from Vika',
             total_length=len(records),

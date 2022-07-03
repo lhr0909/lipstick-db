@@ -10,4 +10,6 @@ RUN pipenv install --system --deploy
 
 COPY . /opt/server/
 
+# RUN VIKA_API_KEY=${vika_api_key} make importer
+
 CMD ["make", "jina-app"]

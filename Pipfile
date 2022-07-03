@@ -5,11 +5,8 @@ name = "pypi"
 
 [packages]
 jina = "==3.6.3"
-playwright = "*"
 docarray = {extras = ["annlite"], version = "==0.13.22"}
-face-recognition = "*"
 opencv-contrib-python = "*"
-matplotlib = "*"
 mediapipe = "*"
 vika = "*"
 fastapi = "*"

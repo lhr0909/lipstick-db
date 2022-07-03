@@ -85,7 +85,7 @@ LipstickPage.getLayout = function getLayout(page: ReactElement) {
   return (
     <AppLayout>
       <Head>
-        <title>Lipstick Detail - Lipstick DB</title>
+        <title>口红详细信息 - Lipstick DB</title>
       </Head>
       {page}
     </AppLayout>
