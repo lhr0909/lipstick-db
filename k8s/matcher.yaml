@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: matcher
+  name: matcher
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: matcher
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: matcher
+    spec:
+      containers:
+      - image: ccr.ccs.tencentyun.com/others/lipstick-db-jina:latest
+        name: matcher
+        command: ["jina", "executor"]
+        args: ["--uses", "matcher.yml", "--port", "8884"]
+        env:
+          - name: JINA_LOG_LEVEL
+            value: DEBUG
+        ports:
+        - containerPort: 8884
+        resources: {}
+      imagePullSecrets:
+      - name: regcred
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: matcher
+spec:
+  selector:
+    app: matcher
+  ports:
+  - protocol: TCP
+    port: 8884
+    targetPort: 8884

@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: lip-skin-color-embedder
+  name: lip-skin-color-embedder
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lip-skin-color-embedder
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: lip-skin-color-embedder
+    spec:
+      containers:
+      - image:  ccr.ccs.tencentyun.com/others/lipstick-db-jina:latest
+        name: lip-skin-color-embedder
+        command: ["jina", "executor"]
+        args: ["--uses", "lip_skin_color_embedder.yml", "--port", "8885"]
+        env:
+          - name: JINA_LOG_LEVEL
+            value: DEBUG
+        ports:
+        - containerPort: 8885
+        resources: {}
+      imagePullSecrets:
+      - name: regcred
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lip-skin-color-embedder
+spec:
+  selector:
+    app: lip-skin-color-embedder
+  ports:
+  - protocol: TCP
+    port: 8885
+    targetPort: 8885

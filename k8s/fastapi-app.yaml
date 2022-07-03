@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: fastapi-app
+  name: fastapi-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastapi-app
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: fastapi-app
+    spec:
+      containers:
+      - image:  ccr.ccs.tencentyun.com/others/fastapi:latest
+        name: fastapi-app
+        env:
+          - name: JINA_HOST
+            value: grpc://flow-service:8888
+          - name: S3_ENDPOINT_URL
+            value: https://cos.ap-guangzhou.myqcloud.com
+          - name: S3_ACCESS_KEY_ID
+            value: 
+          - name: S3_SECRET_ACCESS_KEY
+            value: 
+          - name: S3_REGION
+            value: ap-guangzhou
+          - name: S3_BUCKET_NAME
+            value: lipstick-db-1301213709
+        ports:
+        - containerPort: 9000
+        resources: {}
+      imagePullSecrets:
+      - name: regcred
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi-app
+  annotations:
+    service.kubernetes.io/qcloud-loadbalancer-internal-subnetid: subnet-i1f9spa0
+spec:
+  type: LoadBalancer
+  selector:
+    app: fastapi-app
+  ports:
+  - protocol: TCP
+    port: 9000
+    targetPort: 9000
