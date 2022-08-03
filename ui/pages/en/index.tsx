@@ -23,6 +23,9 @@ export default function IndexPage(props: { body: string }) {
           href="https://github.com/jina-ai/jina"
           target="_blank"
           rel="noreferrer"
+          style={{
+            height: 80,
+          }}
         >
           repo
         </a>{" "}
