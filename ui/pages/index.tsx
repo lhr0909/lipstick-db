@@ -13,7 +13,13 @@ export default function IndexPage(props: { body: string }) {
       <Title level={2}>Lipstick DB</Title>
       <Paragraph>用AI找到最适合你的口红！</Paragraph>
       <Paragraph>
-        <img src="https://jina.ai/assets/images/logo.svg" alt="jina" />
+        <img
+          src="https://jina.ai/assets/images/logo.svg"
+          alt="jina"
+          style={{
+            height: 80,
+          }}
+        />
       </Paragraph>
       <Paragraph>Powered by Jina</Paragraph>
       <Paragraph>
@@ -23,9 +29,6 @@ export default function IndexPage(props: { body: string }) {
           href="https://github.com/jina-ai/jina"
           target="_blank"
           rel="noreferrer"
-          style={{
-            height: 80,
-          }}
         >
           repo
         </a>{" "}
